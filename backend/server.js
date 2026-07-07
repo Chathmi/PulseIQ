@@ -1,13 +1,7 @@
-const express = require("express");
-
-const app = express();
+const app = require("./src/app");
 
 const PORT = 3000;
 
-app.get("/", (req, res) => {
-    res.send("🎉 PulseIQ Backend is Running!");
-});
-
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`🚀 PulseIQ Backend is running on http://localhost:${PORT}`);
 });
