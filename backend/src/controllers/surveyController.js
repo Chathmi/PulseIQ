@@ -1,12 +1,16 @@
+const surveys = require("../data/surveys");
 exports.getSurvey = (req, res) => {
-    res.json({
-        message: "Survey API is working!"
+    res.status(200).json({
+        totalSurveys: surveys.length,
+        surveys: surveys
     });
 };
 exports.submitSurvey = (req, res) => {
-    console.log(req.body);
+    surveys.push(req.body);
 
-    res.json({
+    console.log(surveys);
+
+    res.status(201).json({
         message: "Survey submitted successfully!",
         data: req.body
     });
