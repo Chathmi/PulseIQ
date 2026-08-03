@@ -6,9 +6,10 @@ exports.getSurvey = async (req, res) => {
         const surveys = await Survey.find();
 
         res.status(200).json({
-            totalSurveys: surveys.length,
-            surveys
-        });
+    success: true,
+    count: surveys.length,
+    data: surveys
+});
     } catch (error) {
         res.status(500).json({
             message: "Failed to retrieve surveys.",
@@ -28,7 +29,10 @@ exports.getSurveyById = async (req, res) => {
             });
         }
 
-        res.status(200).json(survey);
+        res.status(200).json({
+    success: true,
+    data: survey
+});
     } catch (error) {
         res.status(500).json({
             message: "Failed to retrieve survey.",
@@ -43,9 +47,10 @@ exports.submitSurvey = async (req, res) => {
         const survey = await Survey.create(req.body);
 
         res.status(201).json({
-            message: "Survey submitted successfully!",
-            data: survey
-        });
+    success: true,
+    message: "Survey submitted successfully!",
+    data: survey
+});
     } catch (error) {
         res.status(500).json({
             message: "Failed to save survey.",
@@ -73,9 +78,10 @@ exports.updateSurvey = async (req, res) => {
         }
 
         res.status(200).json({
-            message: "Survey updated successfully!",
-            data: survey
-        });
+    success: true,
+    message: "Survey updated successfully!",
+    data: survey
+});
     } catch (error) {
         res.status(500).json({
             message: "Failed to update survey.",
@@ -96,9 +102,10 @@ exports.deleteSurvey = async (req, res) => {
         }
 
         res.status(200).json({
-            message: "Survey deleted successfully!",
-            data: survey
-        });
+    success: true,
+    message: "Survey deleted successfully!",
+    data: survey
+});
     } catch (error) {
         res.status(500).json({
             message: "Failed to delete survey.",
