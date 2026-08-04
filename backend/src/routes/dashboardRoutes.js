@@ -7,5 +7,6 @@ router.get("/summary", dashboardController.getDashboardSummary);
 router.get("/weekly", dashboardController.getWeeklyAnalytics);
 router.get("/insights", dashboardController.getInsights);
 router.get("/departments", dashboardController.getDepartmentAnalytics);
+router.get("/employees", dashboardController.getEmployeeTrends);
 
 module.exports = router;
