@@ -29,11 +29,17 @@ const surveySchema = new mongoose.Schema(
             min: 1,
             max: 5
         },
+        department: {
+    type: String,
+    required: true
+},
         comment: {
             type: String,
             required: true,
             trim: true
         }
+
+        
     },
     {
         timestamps: true

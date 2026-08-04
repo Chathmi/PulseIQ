@@ -165,3 +165,53 @@ exports.getInsights = async (req, res) => {
         });
     }
 };
+exports.getDepartmentAnalytics = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        const departments = {};
+
+        surveys.forEach((survey) => {
+            const dept = survey.department;
+
+            if (!departments[dept]) {
+                departments[dept] = {
+                    responses: 0,
+                    workload: 0,
+                    managerSupport: 0,
+                    workLifeBalance: 0
+                };
+            }
+
+            departments[dept].responses++;
+            departments[dept].workload += survey.workload;
+            departments[dept].managerSupport += survey.managerSupport;
+            departments[dept].workLifeBalance += survey.workLifeBalance;
+        });
+
+        const result = Object.keys(departments).map((dept) => ({
+            department: dept,
+            totalResponses: departments[dept].responses,
+            averageWorkload: Number(
+                (departments[dept].workload / departments[dept].responses).toFixed(2)
+            ),
+            averageManagerSupport: Number(
+                (departments[dept].managerSupport / departments[dept].responses).toFixed(2)
+            ),
+            averageWorkLifeBalance: Number(
+                (departments[dept].workLifeBalance / departments[dept].responses).toFixed(2)
+            )
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
