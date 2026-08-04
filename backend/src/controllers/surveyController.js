@@ -3,7 +3,7 @@ const Survey = require("../models/Survey");
 // Get all surveys
 exports.getSurvey = async (req, res) => {
     try {
-        const surveys = await Survey.find();
+        const surveys = await Survey.find().populate("pulseSurvey");
 
         res.status(200).json({
     success: true,

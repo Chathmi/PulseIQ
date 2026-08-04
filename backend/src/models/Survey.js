@@ -6,6 +6,11 @@ const surveySchema = new mongoose.Schema(
             type: Number,
             required: true
         },
+        pulseSurvey: {
+    type: require("mongoose").Schema.Types.ObjectId,
+    ref: "PulseSurvey",
+    required: true
+},
         workload: {
             type: Number,
             required: true,
