@@ -334,3 +334,71 @@ exports.getWellnessRisks = async (req, res) => {
         });
     }
 };
+exports.getWellnessRecommendations = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        const employees = {};
+
+        surveys.forEach((survey) => {
+            const id = survey.employeeId;
+
+            if (!employees[id]) {
+                employees[id] = {
+                    responses: 0,
+                    workload: 0,
+                    managerSupport: 0,
+                    workLifeBalance: 0
+                };
+            }
+
+            employees[id].responses++;
+            employees[id].workload += survey.workload;
+            employees[id].managerSupport += survey.managerSupport;
+            employees[id].workLifeBalance += survey.workLifeBalance;
+        });
+
+        const recommendations = [];
+
+        Object.keys(employees).forEach((id) => {
+            const emp = employees[id];
+
+            const avgWorkload = emp.workload / emp.responses;
+            const avgManagerSupport = emp.managerSupport / emp.responses;
+            const avgWorkLifeBalance = emp.workLifeBalance / emp.responses;
+
+            const actions = [];
+
+            if (avgWorkload >= 4) {
+                actions.push("Review workload distribution.");
+            }
+
+            if (avgManagerSupport <= 2.5) {
+                actions.push("Schedule a manager check-in.");
+            }
+
+            if (avgWorkLifeBalance <= 2.5) {
+                actions.push("Encourage wellbeing initiatives and flexible work options.");
+            }
+
+            if (actions.length > 0) {
+                recommendations.push({
+                    employeeId: Number(id),
+                    recommendations: actions
+                });
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            totalRecommendations: recommendations.length,
+            data: recommendations
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
