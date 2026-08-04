@@ -8,5 +8,6 @@ router.get("/weekly", dashboardController.getWeeklyAnalytics);
 router.get("/insights", dashboardController.getInsights);
 router.get("/departments", dashboardController.getDepartmentAnalytics);
 router.get("/employees", dashboardController.getEmployeeTrends);
+router.get("/wellness-risks", dashboardController.getWellnessRisks);
 
 module.exports = router;

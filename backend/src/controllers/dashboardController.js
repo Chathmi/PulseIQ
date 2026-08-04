@@ -265,3 +265,72 @@ exports.getEmployeeTrends = async (req, res) => {
         });
     }
 };
+exports.getWellnessRisks = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        const employees = {};
+
+        surveys.forEach((survey) => {
+            const id = survey.employeeId;
+
+            if (!employees[id]) {
+                employees[id] = {
+                    responses: 0,
+                    workload: 0,
+                    managerSupport: 0,
+                    workLifeBalance: 0
+                };
+            }
+
+            employees[id].responses++;
+            employees[id].workload += survey.workload;
+            employees[id].managerSupport += survey.managerSupport;
+            employees[id].workLifeBalance += survey.workLifeBalance;
+        });
+
+        const risks = [];
+
+        Object.keys(employees).forEach((id) => {
+            const emp = employees[id];
+
+            const avgWorkload = emp.workload / emp.responses;
+            const avgManagerSupport = emp.managerSupport / emp.responses;
+            const avgWorkLifeBalance = emp.workLifeBalance / emp.responses;
+
+            const reasons = [];
+
+            if (avgWorkload >= 4)
+                reasons.push("High workload");
+
+            if (avgManagerSupport <= 2.5)
+                reasons.push("Low manager support");
+
+            if (avgWorkLifeBalance <= 2.5)
+                reasons.push("Poor work-life balance");
+
+            if (reasons.length > 0) {
+                risks.push({
+                    employeeId: Number(id),
+                    averageWorkload: Number(avgWorkload.toFixed(2)),
+                    averageManagerSupport: Number(avgManagerSupport.toFixed(2)),
+                    averageWorkLifeBalance: Number(avgWorkLifeBalance.toFixed(2)),
+                    riskLevel: "At Risk",
+                    reasons
+                });
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            totalAtRisk: risks.length,
+            data: risks
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
