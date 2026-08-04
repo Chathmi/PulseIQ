@@ -110,3 +110,58 @@ exports.getWeeklyAnalytics = async (req, res) => {
         });
     }
 };
+exports.getInsights = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        if (surveys.length === 0) {
+            return res.status(200).json({
+                success: true,
+                insights: ["No survey responses available."]
+            });
+        }
+
+        let totalWorkload = 0;
+        let totalManagerSupport = 0;
+        let totalWorkLifeBalance = 0;
+
+        surveys.forEach((survey) => {
+            totalWorkload += survey.workload;
+            totalManagerSupport += survey.managerSupport;
+            totalWorkLifeBalance += survey.workLifeBalance;
+        });
+
+        const avgWorkload = totalWorkload / surveys.length;
+        const avgManagerSupport = totalManagerSupport / surveys.length;
+        const avgWorkLifeBalance = totalWorkLifeBalance / surveys.length;
+
+        const insights = [];
+
+        if (avgWorkload >= 4) {
+            insights.push("High workload detected.");
+        }
+
+        if (avgManagerSupport <= 2.5) {
+            insights.push("Low manager support detected.");
+        }
+
+        if (avgWorkLifeBalance <= 2.5) {
+            insights.push("Poor work-life balance detected.");
+        }
+
+        if (insights.length === 0) {
+            insights.push("No major issues detected.");
+        }
+
+        res.status(200).json({
+            success: true,
+            insights
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
