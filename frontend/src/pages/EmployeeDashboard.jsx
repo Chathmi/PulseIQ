@@ -1,55 +1,58 @@
 import { useEffect, useState } from "react";
 
 function EmployeeDashboard() {
-  const [dashboardData, setDashboardData] = useState(null);
-  const [error, setError] = useState("");
+    const [dashboardData, setDashboardData] = useState(null);
+    const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch("http://localhost:3000/api/dashboard/summary")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setDashboardData(data.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("Unable to load dashboard data");
-      });
-  }, []);
+    useEffect(() => {
+        fetch("http://localhost:3000/api/dashboard/summary")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch dashboard data");
+                }
 
-  if (error) {
-    return <h2>{error}</h2>;
-  }
+                return response.json();
+            })
+            .then((data) => {
+                setDashboardData(data.data);
+            })
+            .catch((error) => {
+                console.error(error);
+                setError("Unable to load dashboard data");
+            });
+    }, []);
 
-  if (!dashboardData) {
-    return <h2>Loading dashboard...</h2>;
-  }
+    if (error) {
+        return <p>{error}</p>;
+    }
 
-  return (
-    <div>
-      <h1>Employee Dashboard</h1>
+    if (!dashboardData) {
+        return <p>Loading dashboard...</p>;
+    }
 
-      <p>Total Responses: {dashboardData.totalResponses}</p>
+    return (
+        <div>
+            <h1>Employee Dashboard</h1>
 
-      <p>
-        Average Workload: {dashboardData.averageWorkload}
-      </p>
+            <p>
+                Total Responses: {dashboardData.totalResponses}
+            </p>
 
-      <p>
-        Average Manager Support:{" "}
-        {dashboardData.averageManagerSupport}
-      </p>
+            <p>
+                Average Workload: {dashboardData.averageWorkload}
+            </p>
 
-      <p>
-        Average Work-Life Balance:{" "}
-        {dashboardData.averageWorkLifeBalance}
-      </p>
-    </div>
-  );
+            <p>
+                Average Manager Support:{" "}
+                {dashboardData.averageManagerSupport}
+            </p>
+
+            <p>
+                Average Work-Life Balance:{" "}
+                {dashboardData.averageWorkLifeBalance}
+            </p>
+        </div>
+    );
 }
 
 export default EmployeeDashboard;
