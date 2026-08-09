@@ -13,5 +13,6 @@ router.get(
     "/wellness-recommendations",
     dashboardController.getWellnessRecommendations
 );
+router.get("/organization-report", dashboardController.getOrganizationHealthReport);
 
 module.exports = router;

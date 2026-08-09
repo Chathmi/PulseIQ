@@ -402,3 +402,62 @@ exports.getWellnessRecommendations = async (req, res) => {
         });
     }
 };
+exports.getOrganizationHealthReport = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        if (surveys.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: {
+                    totalResponses: 0,
+                    averageWorkload: 0,
+                    averageManagerSupport: 0,
+                    averageWorkLifeBalance: 0,
+                    overallHealth: "No Data"
+                }
+            });
+        }
+
+        let workload = 0;
+        let managerSupport = 0;
+        let workLifeBalance = 0;
+
+        surveys.forEach((survey) => {
+            workload += survey.workload;
+            managerSupport += survey.managerSupport;
+            workLifeBalance += survey.workLifeBalance;
+        });
+
+        const avgWorkload = Number((workload / surveys.length).toFixed(2));
+        const avgManagerSupport = Number((managerSupport / surveys.length).toFixed(2));
+        const avgWorkLifeBalance = Number((workLifeBalance / surveys.length).toFixed(2));
+
+        let overallHealth = "Healthy";
+
+        if (
+            avgWorkload >= 4 ||
+            avgManagerSupport <= 2.5 ||
+            avgWorkLifeBalance <= 2.5
+        ) {
+            overallHealth = "Needs Attention";
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {
+                totalResponses: surveys.length,
+                averageWorkload: avgWorkload,
+                averageManagerSupport: avgManagerSupport,
+                averageWorkLifeBalance: avgWorkLifeBalance,
+                overallHealth
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
