@@ -8,5 +8,9 @@ router.get(
     "/summary",
     wellnessTrendController.getWellnessTrendSummary
 );
+router.get(
+    "/insights",
+    wellnessTrendController.getWellnessTrendInsights
+);
 
 module.exports = router;
