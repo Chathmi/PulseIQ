@@ -66,3 +66,106 @@ exports.getWellnessTrends = async (req, res) => {
         });
     }
 };
+exports.getWellnessTrendSummary = async (req, res) => {
+    try {
+        const surveys = await Survey.find().populate("pulseSurvey");
+
+        const weeklyData = {};
+
+        surveys.forEach((survey) => {
+            if (!survey.pulseSurvey) {
+                return;
+            }
+
+            const week = survey.pulseSurvey.weekNumber;
+
+            if (!weeklyData[week]) {
+                weeklyData[week] = {
+                    totalResponses: 0,
+                    totalWorkload: 0,
+                    totalManagerSupport: 0,
+                    totalWorkLifeBalance: 0
+                };
+            }
+
+            weeklyData[week].totalResponses++;
+            weeklyData[week].totalWorkload += survey.workload;
+            weeklyData[week].totalManagerSupport += survey.managerSupport;
+            weeklyData[week].totalWorkLifeBalance += survey.workLifeBalance;
+        });
+
+        const weeks = Object.keys(weeklyData)
+            .map(Number)
+            .sort((a, b) => a - b);
+
+        if (weeks.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: {
+                    trend: "No data",
+                    firstWeekScore: 0,
+                    latestWeekScore: 0,
+                    change: 0
+                }
+            });
+        }
+
+        const calculateWeeklyScore = (week) => {
+            const data = weeklyData[week];
+
+            const averageWorkload =
+                data.totalWorkload / data.totalResponses;
+
+            const averageManagerSupport =
+                data.totalManagerSupport / data.totalResponses;
+
+            const averageWorkLifeBalance =
+                data.totalWorkLifeBalance / data.totalResponses;
+
+            return Number(
+                (
+                    (
+                        averageWorkload +
+                        averageManagerSupport +
+                        averageWorkLifeBalance
+                    ) / 3
+                ).toFixed(2)
+            );
+        };
+
+        const firstWeekScore = calculateWeeklyScore(weeks[0]);
+        const latestWeekScore = calculateWeeklyScore(
+            weeks[weeks.length - 1]
+        );
+
+        const change = Number(
+            (latestWeekScore - firstWeekScore).toFixed(2)
+        );
+
+        let trend;
+
+        if (change > 0.1) {
+            trend = "Improving";
+        } else if (change < -0.1) {
+            trend = "Declining";
+        } else {
+            trend = "Stable";
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {
+                trend,
+                firstWeekScore,
+                latestWeekScore,
+                change
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
