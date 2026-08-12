@@ -4,5 +4,9 @@ const router = express.Router();
 const organizationHealthController = require("../controllers/organizationHealthController");
 
 router.get("/score", organizationHealthController.getOrganizationHealthScore);
+router.get(
+    "/status",
+    organizationHealthController.getOrganizationHealthStatus
+);
 
 module.exports = router;
