@@ -6,11 +6,12 @@ const surveyRoutes = require("./routes/surveyRoutes");
 const pulseSurveyRoutes = require("./routes/pulseSurveyRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const organizationHealthRoutes = require("./routes/organizationHealthRoutes");
+const wellnessTrendRoutes = require("./routes/wellnessTrendRoutes");
 
 const app = express();
 
 app.use(cors());
-
+app.use("/api/wellness-trends", wellnessTrendRoutes);
 app.use(express.json());
 
 app.use("/api/pulse-surveys", pulseSurveyRoutes);
