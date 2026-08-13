@@ -8,5 +8,9 @@ router.get(
     "/status",
     organizationHealthController.getOrganizationHealthStatus
 );
+router.get(
+    "/breakdown",
+    organizationHealthController.getOrganizationHealthBreakdown
+);
 
 module.exports = router;

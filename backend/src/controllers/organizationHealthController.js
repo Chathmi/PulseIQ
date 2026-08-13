@@ -145,3 +145,83 @@ exports.getOrganizationHealthStatus = async (req, res) => {
         });
     }
 };
+exports.getOrganizationHealthBreakdown = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        const totalResponses = surveys.length;
+
+        if (totalResponses === 0) {
+            return res.status(200).json({
+                success: true,
+                data: {
+                    workload: {
+                        score: 0,
+                        status: "No data"
+                    },
+                    managerSupport: {
+                        score: 0,
+                        status: "No data"
+                    },
+                    workLifeBalance: {
+                        score: 0,
+                        status: "No data"
+                    }
+                }
+            });
+        }
+
+        let totalWorkload = 0;
+        let totalManagerSupport = 0;
+        let totalWorkLifeBalance = 0;
+
+        surveys.forEach((survey) => {
+            totalWorkload += survey.workload;
+            totalManagerSupport += survey.managerSupport;
+            totalWorkLifeBalance += survey.workLifeBalance;
+        });
+
+        const averageWorkload =
+            totalWorkload / totalResponses;
+
+        const averageManagerSupport =
+            totalManagerSupport / totalResponses;
+
+        const averageWorkLifeBalance =
+            totalWorkLifeBalance / totalResponses;
+
+        const getStatus = (score) => {
+            if (score >= 3.5) {
+                return "Healthy";
+            } else if (score >= 2.5) {
+                return "Moderate";
+            } else {
+                return "Needs Attention";
+            }
+        };
+
+        res.status(200).json({
+            success: true,
+            data: {
+                workload: {
+                    score: Number(averageWorkload.toFixed(2)),
+                    status: getStatus(averageWorkload)
+                },
+                managerSupport: {
+                    score: Number(averageManagerSupport.toFixed(2)),
+                    status: getStatus(averageManagerSupport)
+                },
+                workLifeBalance: {
+                    score: Number(averageWorkLifeBalance.toFixed(2)),
+                    status: getStatus(averageWorkLifeBalance)
+                }
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
