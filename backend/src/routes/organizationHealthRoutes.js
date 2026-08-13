@@ -12,5 +12,9 @@ router.get(
     "/breakdown",
     organizationHealthController.getOrganizationHealthBreakdown
 );
+router.get(
+    "/departments",
+    organizationHealthController.getDepartmentHealth
+);
 
 module.exports = router;

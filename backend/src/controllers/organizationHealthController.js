@@ -225,3 +225,95 @@ exports.getOrganizationHealthBreakdown = async (req, res) => {
         });
     }
 };
+exports.getDepartmentHealth = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        if (surveys.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: []
+            });
+        }
+
+        const departmentData = {};
+
+        surveys.forEach((survey) => {
+            const department = survey.department || "Unknown";
+            if (!departmentData[department]) {
+                departmentData[department] = {
+                    totalResponses: 0,
+                    totalWorkload: 0,
+                    totalManagerSupport: 0,
+                    totalWorkLifeBalance: 0
+                };
+            }
+
+            departmentData[department].totalResponses++;
+            departmentData[department].totalWorkload += survey.workload;
+            departmentData[department].totalManagerSupport += survey.managerSupport;
+            departmentData[department].totalWorkLifeBalance += survey.workLifeBalance;
+        });
+
+        const getStatus = (score) => {
+            if (score >= 70) {
+                return "Healthy";
+            } else if (score >= 50) {
+                return "Moderate";
+            } else {
+                return "Needs Attention";
+            }
+        };
+
+        const result = Object.keys(departmentData).map((department) => {
+            const data = departmentData[department];
+
+            const averageWorkload =
+                data.totalWorkload / data.totalResponses;
+
+            const averageManagerSupport =
+                data.totalManagerSupport / data.totalResponses;
+
+            const averageWorkLifeBalance =
+                data.totalWorkLifeBalance / data.totalResponses;
+
+            const overallAverage =
+                (
+                    averageWorkload +
+                    averageManagerSupport +
+                    averageWorkLifeBalance
+                ) / 3;
+
+            const healthScore = Number(
+                (overallAverage * 20).toFixed(2)
+            );
+
+            return {
+                department,
+                totalResponses: data.totalResponses,
+                averageWorkload: Number(
+                    averageWorkload.toFixed(2)
+                ),
+                averageManagerSupport: Number(
+                    averageManagerSupport.toFixed(2)
+                ),
+                averageWorkLifeBalance: Number(
+                    averageWorkLifeBalance.toFixed(2)
+                ),
+                healthScore,
+                status: getStatus(healthScore)
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
