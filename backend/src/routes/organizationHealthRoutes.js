@@ -16,5 +16,9 @@ router.get(
     "/departments",
     organizationHealthController.getDepartmentHealth
 );
+router.get(
+    "/department-ranking",
+    organizationHealthController.getDepartmentHealthRanking
+);
 
 module.exports = router;
