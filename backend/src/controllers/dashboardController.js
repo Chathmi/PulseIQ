@@ -461,3 +461,36 @@ exports.getOrganizationHealthReport = async (req, res) => {
         });
     }
 };
+exports.getParticipationAnalytics = async (req, res) => {
+    try {
+        const surveys = await Survey.find();
+
+        const totalResponses = surveys.length;
+
+        const uniqueEmployees = new Set(
+            surveys.map((survey) => survey.employeeId)
+        ).size;
+
+        const averageResponsesPerEmployee =
+            uniqueEmployees === 0
+                ? 0
+                : Number(
+                    (totalResponses / uniqueEmployees).toFixed(2)
+                );
+
+        res.status(200).json({
+            success: true,
+            data: {
+                totalResponses,
+                uniqueEmployees,
+                averageResponsesPerEmployee
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

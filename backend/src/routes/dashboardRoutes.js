@@ -14,5 +14,9 @@ router.get(
     dashboardController.getWellnessRecommendations
 );
 router.get("/organization-report", dashboardController.getOrganizationHealthReport);
+router.get(
+    "/participation",
+    dashboardController.getParticipationAnalytics
+);
 
 module.exports = router;
