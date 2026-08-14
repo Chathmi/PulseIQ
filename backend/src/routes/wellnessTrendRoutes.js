@@ -12,5 +12,9 @@ router.get(
     "/insights",
     wellnessTrendController.getWellnessTrendInsights
 );
+router.get(
+    "/employee/:employeeId",
+    wellnessTrendController.getEmployeeWellnessTrends
+);
 
 module.exports = router;

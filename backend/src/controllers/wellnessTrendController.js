@@ -268,3 +268,60 @@ exports.getWellnessTrendInsights = async (req, res) => {
         });
     }
 };
+exports.getEmployeeWellnessTrends = async (req, res) => {
+    try {
+        const employeeId = Number(req.params.employeeId);
+
+        if (!employeeId) {
+            return res.status(400).json({
+                success: false,
+                message: "Employee ID is required."
+            });
+        }
+
+        const surveys = await Survey.find({
+            employeeId
+        }).populate("pulseSurvey");
+
+        if (surveys.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: []
+            });
+        }
+
+        const result = surveys
+            .filter((survey) => survey.pulseSurvey)
+            .map((survey) => {
+                const wellnessScore =
+                    (
+                        survey.workload +
+                        survey.managerSupport +
+                        survey.workLifeBalance
+                    ) / 3;
+
+                return {
+                    employeeId: survey.employeeId,
+                    weekNumber: survey.pulseSurvey.weekNumber,
+                    workload: survey.workload,
+                    managerSupport: survey.managerSupport,
+                    workLifeBalance: survey.workLifeBalance,
+                    wellnessScore: Number(
+                        wellnessScore.toFixed(2)
+                    )
+                };
+            })
+            .sort((a, b) => a.weekNumber - b.weekNumber);
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
