@@ -57,9 +57,12 @@ exports.getWeeklyAnalytics = async (req, res) => {
 
         const weeklyData = {};
 
-        surveys.forEach((survey) => {
-            const week = survey.pulseSurvey.weekNumber;
+       surveys.forEach((survey) => {
+    if (!survey.pulseSurvey) {
+        return;
+    }
 
+    const week = survey.pulseSurvey.weekNumber;
             if (!weeklyData[week]) {
                 weeklyData[week] = {
                     totalResponses: 0,
