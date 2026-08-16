@@ -1,48 +1,60 @@
 const validateSurvey = (req, res, next) => {
     const {
         employeeId,
+        pulseSurvey,
         workload,
         managerSupport,
         workLifeBalance,
+        department,
         comment
     } = req.body;
 
     // Check required fields
     if (
         employeeId === undefined ||
+        pulseSurvey === undefined ||
         workload === undefined ||
         managerSupport === undefined ||
         workLifeBalance === undefined ||
+        department === undefined ||
         comment === undefined
     ) {
         return res.status(400).json({
             message: "All survey fields are required."
         });
     }
+
     // Employee ID must be a positive number
-if (!Number.isInteger(employeeId) || employeeId <= 0) {
-    return res.status(400).json({
-        message: "Employee ID must be a positive integer."
-    });
-}
-
-// Ratings must be between 1 and 5
-const ratings = [workload, managerSupport, workLifeBalance];
-
-for (const rating of ratings) {
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    if (!Number.isInteger(employeeId) || employeeId <= 0) {
         return res.status(400).json({
-            message: "Ratings must be integers between 1 and 5."
+            message: "Employee ID must be a positive integer."
         });
     }
-}
 
-// Comment cannot be empty
-if (typeof comment !== "string" || comment.trim() === "") {
-    return res.status(400).json({
-        message: "Comment cannot be empty."
-    });
-}
+    // Ratings must be between 1 and 5
+    const ratings = [workload, managerSupport, workLifeBalance];
+
+    for (const rating of ratings) {
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+            return res.status(400).json({
+                message: "Ratings must be integers between 1 and 5."
+            });
+        }
+    }
+
+    // Department cannot be empty
+    if (typeof department !== "string" || department.trim() === "") {
+        return res.status(400).json({
+            message: "Department cannot be empty."
+        });
+    }
+
+    // Comment cannot be empty
+    if (typeof comment !== "string" || comment.trim() === "") {
+        return res.status(400).json({
+            message: "Comment cannot be empty."
+        });
+    }
 
     next();
 };
