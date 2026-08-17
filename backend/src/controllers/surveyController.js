@@ -6,12 +6,13 @@ exports.getSurvey = async (req, res) => {
         const surveys = await Survey.find().populate("pulseSurvey");
 
         res.status(200).json({
-    success: true,
-    count: surveys.length,
-    data: surveys
-});
+            success: true,
+            count: surveys.length,
+            data: surveys
+        });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Failed to retrieve surveys.",
             error: error.message
         });
@@ -30,11 +31,12 @@ exports.getSurveyById = async (req, res) => {
         }
 
         res.status(200).json({
-    success: true,
-    data: survey
-});
+            success: true,
+            data: survey
+        });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Failed to retrieve survey.",
             error: error.message
         });
@@ -47,12 +49,13 @@ exports.submitSurvey = async (req, res) => {
         const survey = await Survey.create(req.body);
 
         res.status(201).json({
-    success: true,
-    message: "Survey submitted successfully!",
-    data: survey
-});
+            success: true,
+            message: "Survey submitted successfully!",
+            data: survey
+        });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Failed to save survey.",
             error: error.message
         });
@@ -78,12 +81,13 @@ exports.updateSurvey = async (req, res) => {
         }
 
         res.status(200).json({
-    success: true,
-    message: "Survey updated successfully!",
-    data: survey
-});
+            success: true,
+            message: "Survey updated successfully!",
+            data: survey
+        });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Failed to update survey.",
             error: error.message
         });
@@ -102,12 +106,13 @@ exports.deleteSurvey = async (req, res) => {
         }
 
         res.status(200).json({
-    success: true,
-    message: "Survey deleted successfully!",
-    data: survey
-});
+            success: true,
+            message: "Survey deleted successfully!",
+            data: survey
+        });
     } catch (error) {
         res.status(500).json({
+            success: false,
             message: "Failed to delete survey.",
             error: error.message
         });
