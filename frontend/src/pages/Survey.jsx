@@ -1,24 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function Survey() {
+  const [pulseSurvey, setPulseSurvey] = useState(null);
   const [formData, setFormData] = useState({
     employeeId: "",
     workload: "",
     managerSupport: "",
     workLifeBalance: "",
+    department: "",
     comment: "",
   });
 
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchPulseSurvey = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/pulse-surveys"
+        );
+
+        const surveys = response.data.data || [];
+        const activeSurvey =
+          surveys.find((survey) => survey.isActive) || surveys[0];
+
+        setPulseSurvey(activeSurvey);
+      } catch (error) {
+        console.error("Failed to load pulse survey:", error);
+        setMessage("Unable to load the weekly survey.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPulseSurvey();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    setMessage("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
@@ -26,86 +56,152 @@ function Survey() {
       !formData.workload ||
       !formData.managerSupport ||
       !formData.workLifeBalance ||
-      !formData.comment
+      !formData.department ||
+      !formData.comment.trim()
     ) {
       setMessage("Please fill in all fields.");
       return;
     }
 
-    setMessage("Survey submitted successfully!");
+    if (!pulseSurvey?._id) {
+      setMessage("No active survey is available.");
+      return;
+    }
 
-    setFormData({
-      employeeId: "",
-      workload: "",
-      managerSupport: "",
-      workLifeBalance: "",
-      comment: "",
-    });
+    setSubmitting(true);
+    setMessage("");
+
+    try {
+      await axios.post("http://localhost:3000/api/surveys", {
+        employeeId: Number(formData.employeeId),
+        pulseSurvey: pulseSurvey._id,
+        workload: Number(formData.workload),
+        managerSupport: Number(formData.managerSupport),
+        workLifeBalance: Number(formData.workLifeBalance),
+        department: formData.department,
+        comment: formData.comment.trim(),
+      });
+
+      setMessage("Survey submitted successfully!");
+
+      setFormData({
+        employeeId: "",
+        workload: "",
+        managerSupport: "",
+        workLifeBalance: "",
+        department: "",
+        comment: "",
+      });
+    } catch (error) {
+      console.error("Survey submission error:", error);
+
+      setMessage(
+        error.response?.data?.message ||
+          "Failed to submit the survey. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  if (loading) {
+    return <p>Loading weekly survey...</p>;
+  }
+
   return (
-    <div>
+    <div className="survey-page">
       <h1>Employee Wellness Survey</h1>
 
-      {message && <p>{message}</p>}
+      {pulseSurvey && (
+        <>
+          <h2>{pulseSurvey.title}</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          name="employeeId"
-          placeholder="Employee ID"
-          value={formData.employeeId}
-          onChange={handleChange}
-        />
+          <p>
+            Please take a moment to share how you're doing this week.
+          </p>
 
-        <br />
-        <br />
+          {message && <p>{message}</p>}
 
-        <input
-          type="number"
-          name="workload"
-          placeholder="Workload (1-5)"
-          value={formData.workload}
-          onChange={handleChange}
-        />
+          <form onSubmit={handleSubmit}>
+            <input
+              type="number"
+              name="employeeId"
+              placeholder="Employee ID"
+              value={formData.employeeId}
+              onChange={handleChange}
+            />
 
-        <br />
-        <br />
+            <select
+              name="department"
+              value={formData.department}
+              onChange={handleChange}
+            >
+              <option value="">Select Department</option>
+              <option value="IT">IT</option>
+              <option value="HR">HR</option>
+              <option value="Finance">Finance</option>
+            </select>
 
-        <input
-          type="number"
-          name="managerSupport"
-          placeholder="Manager Support (1-5)"
-          value={formData.managerSupport}
-          onChange={handleChange}
-        />
+            <label>Workload</label>
+            <select
+              name="workload"
+              value={formData.workload}
+              onChange={handleChange}
+            >
+              <option value="">Select rating</option>
+              <option value="1">1 - Very Low</option>
+              <option value="2">2 - Low</option>
+              <option value="3">3 - Moderate</option>
+              <option value="4">4 - High</option>
+              <option value="5">5 - Very High</option>
+            </select>
 
-        <br />
-        <br />
+            <label>Manager Support</label>
+            <select
+              name="managerSupport"
+              value={formData.managerSupport}
+              onChange={handleChange}
+            >
+              <option value="">Select rating</option>
+              <option value="1">1 - Very Poor</option>
+              <option value="2">2 - Poor</option>
+              <option value="3">3 - Average</option>
+              <option value="4">4 - Good</option>
+              <option value="5">5 - Excellent</option>
+            </select>
 
-        <input
-          type="number"
-          name="workLifeBalance"
-          placeholder="Work-Life Balance (1-5)"
-          value={formData.workLifeBalance}
-          onChange={handleChange}
-        />
+            <label>Work-Life Balance</label>
+            <select
+              name="workLifeBalance"
+              value={formData.workLifeBalance}
+              onChange={handleChange}
+            >
+              <option value="">Select rating</option>
+              <option value="1">1 - Very Poor</option>
+              <option value="2">2 - Poor</option>
+              <option value="3">3 - Average</option>
+              <option value="4">4 - Good</option>
+              <option value="5">5 - Excellent</option>
+            </select>
 
-        <br />
-        <br />
+            <textarea
+              name="comment"
+              placeholder="Share any comments or feedback..."
+              value={formData.comment}
+              onChange={handleChange}
+              rows="5"
+            />
 
-        <textarea
-          name="comment"
-          placeholder="Comments"
-          value={formData.comment}
-          onChange={handleChange}
-        />
+            <button type="submit" disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit Survey"}
+            </button>
+          </form>
+        </>
+      )}
 
-        <br />
-        <br />
-
-        <button type="submit">Submit Survey</button>
-      </form>
+      {!pulseSurvey && !message && (
+        <p>No active survey is currently available.</p>
+      )}
     </div>
   );
 }
