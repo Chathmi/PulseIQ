@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./App.css";
 
 import Navbar from "./components/Navbar";
 
@@ -12,9 +13,9 @@ import NotFound from "./pages/NotFound";
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+     {window.location.pathname !== "/" && <Navbar />}
 
-      <Routes>
+<Routes>
         <Route path="/" element={<Login />} />
         <Route path="/employee" element={<EmployeeDashboard />} />
         <Route path="/manager" element={<ManagerDashboard />} />
