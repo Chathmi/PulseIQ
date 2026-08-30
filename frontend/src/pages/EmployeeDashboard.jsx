@@ -8,7 +8,7 @@ function EmployeeDashboard() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/dashboard/summary")
+      .get("/api/dashboard/summary")
       .then((response) => {
         setDashboardData(response.data.data);
       })
