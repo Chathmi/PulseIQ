@@ -19,9 +19,7 @@ function Survey() {
   useEffect(() => {
     const fetchPulseSurvey = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/pulse-surveys"
-        );
+        const response = await axios.get("/api/pulse-surveys");
 
         const surveys = response.data.data || [];
         const activeSurvey =
@@ -72,7 +70,7 @@ function Survey() {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:3000/api/surveys", {
+      await axios.post("/api/surveys", {
         employeeId: Number(formData.employeeId),
         pulseSurvey: pulseSurvey._id,
         workload: Number(formData.workload),
