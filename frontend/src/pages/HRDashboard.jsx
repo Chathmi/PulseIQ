@@ -22,16 +22,12 @@ function HRDashboard() {
           trendRes,
           insightRes,
         ] = await Promise.all([
-          axios.get("http://localhost:3000/api/organization-health/score"),
-          axios.get(
-            "http://localhost:3000/api/organization-health/breakdown"
-          ),
-          axios.get(
-            "http://localhost:3000/api/organization-health/department-ranking"
-          ),
-          axios.get("http://localhost:3000/api/dashboard/participation"),
-          axios.get("http://localhost:3000/api/wellness-trends/summary"),
-          axios.get("http://localhost:3000/api/wellness-trends/insights"),
+          axios.get("/api/organization-health/score"),
+          axios.get("/api/organization-health/breakdown"),
+          axios.get("/api/organization-health/department-ranking"),
+          axios.get("/api/dashboard/participation"),
+          axios.get("/api/wellness-trends/summary"),
+          axios.get("/api/wellness-trends/insights"),
         ]);
 
         setHealth(healthRes.data.data);
