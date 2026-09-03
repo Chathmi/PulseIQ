@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -12,11 +13,9 @@ function ManagerDashboard() {
       try {
         const [employeesRes, risksRes, recommendationsRes] =
           await Promise.all([
-            axios.get("http://localhost:3000/api/dashboard/employees"),
-            axios.get("http://localhost:3000/api/dashboard/wellness-risks"),
-            axios.get(
-              "http://localhost:3000/api/dashboard/wellness-recommendations"
-            ),
+            axios.get("/api/dashboard/employees"),
+            axios.get("/api/dashboard/wellness-risks"),
+            axios.get("/api/dashboard/wellness-recommendations"),
           ]);
 
         setEmployees(employeesRes.data.data);
